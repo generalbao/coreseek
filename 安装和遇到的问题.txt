@@ -1,0 +1,39 @@
+2016年12月23日16:56:53
+
+11111 下载
+ wget http://www.coreseek.cn/uploads/csft/3.2/coreseek-3.2.14.tar.gz
+ tar xzvf coreseek-3.2.14.tar.gz
+ cd coreseek-3.2.14
+ 
+ 安装mmseg  中文分词算法
+$ cd mmseg-3.2.14
+$ ./bootstrap    #输出的warning信息可以忽略，如果出现error则需要解决
+$ ./configure --prefix=/usr/local/mmseg3
+$ make && make install
+$ cd ..
+
+
+##安装coreseek
+$ cd csft-3.2.14 或者 cd csft-4.0.1 或者 cd csft-4.1
+$ sh buildconf.sh    #输出的warning信息可以忽略，如果出现error则需要解决
+$ ./configure --prefix=/usr/local/coreseek  --without-unixodbc --with-mmseg --with-mmseg-includes=/usr/local/mmseg3/include/mmseg/
+--with-mmseg-libs=/usr/local/mmseg3/lib/ --with-mysql    ##如果提示mysql问题，可以查看MySQL数据源安装说明
+$ make && make install
+$ cd ..
+
+问题111       !!!!!
+数据源支持：支持MySQL数据源  如果是mariadb   就安装 mariadb-devel(包含开发首要的文件和一些静态库)!!!!
+yum install mysql-devel libxml2-devel expat-devel
+
+如果出现错误提示：“ERROR: cannot find MySQL include files.......To disable MySQL support, use --without-mysql option.“，可按照如下方法处理：
+##请找到头文件mysql.h所在的目录，一般是/usr/local/mysql/include，请替换为实际的
+##请找到库文件libmysqlclient.a所在的目录，一般是/usr/local/mysql/lib，请替换为实际的
+
+
+!!!!!!  如果是yum 安装 只有 libmysqlclient.so !!!!!!一个是静态 一个是动态！！！！
+
+
+##configure参数加上：--with-mysql-includes=/usr/local/mysql/include --with-mysql-libs=/usr/local/mysql/lib，执行后，重新编译安装
+ 
+ 问题2222
+T val = ExprEval ( this->m_pArg, tMatch )  改为 T val = this->ExprEval ( this->m_pArg, tMatch )
