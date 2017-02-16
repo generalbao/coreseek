@@ -1,0 +1,45 @@
+1111111111 coreseek文档 服务器  我的安装在 /usr/local/coreseek
+http://www.coreseek.cn/docs/coreseek_4.1-sphinx_2.0.1-beta.html
+建立数据源 ====》 生成索引 ===》开启 searchd 搜索服务
+
+aaaaa 建立数据源
+cd etc
+cp sphinx.conf.dist sphinx.conf
+vim sphinx.conf  最重要配置mysql
+
+
+type                                    = mysql
+
+        #####################################################################
+        ## SQL settings (for 'mysql' and 'pgsql' types)
+        #####################################################################
+
+        # some straightforward parameters for SQL source types
+        sql_host                                = localhost
+        sql_user                                = root
+        sql_pass                                =
+        sql_db                                  = xxx
+        sql_port                                = 3306  # 
+
+sql_query = xxxx
+
+bbbb  生成索引 
+cd bin
+index --config ../etc/shinx.conf --all
+
+cccc 开启 searchd 搜索服务
+bin/searchd --config ../etc/shinx.conf
+
+222222222222
+php sphinx 客户端
+http://php.net/manual/en/book.sphinx.php
+
+$s = new SphinxClient;
+$s->setServer("localhost", 9312) or die('die');
+$s->setMatchMode(SPH_MATCH_ANY);
+$s->setMaxQueryTime(3);
+
+$result = $s->query('may');
+
+var_dump($result);
+
