@@ -1,0 +1,25 @@
+2016年12月23日17:47:09
+
+可以在这里（http://pecl.php.net/package/sphinx）找到sphinx的php扩展源码  
+
+！！！！！！ 下载最新的 http://pecl.php.net/get/sphinx-1.3.3.tgz    
+1.3.1版本报错 sphinx-1.3.1/sphinx.c:1975:15: error: ‘SPH_RANK_PROXIMITY’ undeclared 
+ 
+
+
+注意，使用phpize，configure的时候可能会要求要安装libsphinxclient，它在coreseek-xxx
+/csft-xx/api/libsphinxclient/里面能找到，编译安装它以后就可以configure，make，生成动态so文件了。
+
+
+11111
+cd libsphinxclient/
+./configure --prefix=/usr/local/libsphinxclient
+make && make install
+
+
+22222
+
+cd sphinx
+/usr/bin/phpize
+
+./configure --with-php-config=/usr/bin/php-config --with-sphinx=/usr/local/libsphinxclient(如果没安装libshinxclient就会报错)
