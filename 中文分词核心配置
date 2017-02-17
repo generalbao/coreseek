@@ -1,0 +1,15 @@
+编辑coreseek 配置文件
+etc/xxx.conf
+
+#以下部分为中文分词核心配置
+#stopwords = /path/to/stowords.txt的位置
+charset_dictpath = /usr/local/mmseg3/etc/    必须设置，表示词典文件的目录，该目录下必须有uni.lib词典文件存在；
+charset_type = zh_cn.utf-8
+#charset_table = .................... #需将原有
+的该配置注释掉
+ngram_len = 0  必须设置，表示取消原有的一元字符切分模式，不使其对中文分词产生干扰；
+
+charset_table的配置需要注释掉！
+
+ngram_len的配置需要设置为0！
+#以上部分为中文分词核心配置
