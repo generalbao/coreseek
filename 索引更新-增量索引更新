@@ -1,0 +1,55 @@
+有这么一种常见的情况：整个数据集非常大，以至于难于经常性的重建索引，但是每次新增的记录却相当地少。一个典型的例子是：一个论坛有1000000个已经归档的帖子
+，但每天只有1000个新帖子。
+
+在这种情况下可以用所谓的“主索引＋增量索引”（main+delta）模式来实现“近实时”的索引更新。
+
+这种方法的基本思路是设置两个数据源和两个索引，对很少更新或根本不更新的数据建立主索引，而对新增文档建立增量索引。在上述例子中，
+那1000000个已经归档的帖子放在主索引中，而每天新增的1000个帖子则放在增量索引中。增量索引更新的频率可以非常快，而文档可以在出现几分种内就可以被检索到。
+
+确定具体某一文档的分属那个索引的分类工作可以自动完成。一个可选的方案是，建立一个计数表，记录将文档集分成两部分的那个文档ID，
+而每次重新构建主索引时，这个表都会被更新。
+
+例 3.4. 完全自动化的实时索引
+
+# in MySQL
+CREATE TABLE sph_counter
+(
+    counter_id INTEGER PRIMARY KEY NOT NULL,
+    max_doc_id INTEGER NOT NULL
+);
+
+# in sphinx.conf
+source main
+{
+    # ...
+    sql_query_pre = SET NAMES utf8
+    sql_query_pre = REPLACE INTO sph_counter SELECT 1, MAX(id) FROM documents
+    sql_query = SELECT id, title, body FROM documents \
+        WHERE id<=( SELECT max_doc_id FROM sph_counter WHERE counter_id=1 )
+}
+
+source delta : main
+{
+    sql_query_pre = SET NAMES utf8
+    sql_query = SELECT id, title, body FROM documents \
+        WHERE id>( SELECT max_doc_id FROM sph_counter WHERE counter_id=1 )
+}
+
+index main
+{
+    source = main
+    path = /path/to/main
+    # ... all the other settings
+}
+
+# note how all other settings are copied from main,
+# but source and path are overridden (they MUST be)
+index delta : main
+{
+    source = delta
+    path = /path/to/delta
+}
+
+请注意，上例中我们显示设置了数据源delta的sql_query_pre选项，覆盖了全局设置。必须显示地覆盖这个选项，否则对delta做索引的时候也会运行那条REPLACE查询
+，那样会导致delta源中选出的数据为空。可是简单地将delta的sql_query_pre设置成空也不行，因为在继承来的数据源上第一次运行这个指令的时候，
+继承来的所有值都会被清空，这样编码设置的部分也会丢失。因此需要再次显式调用编码设置查询。
