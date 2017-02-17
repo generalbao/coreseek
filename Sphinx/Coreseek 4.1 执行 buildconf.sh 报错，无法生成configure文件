@@ -1,0 +1,31 @@
+ Sphinx/Coreseek 4.1 执行 buildconf.sh 报错，无法生成configure文件
+ 
+ 转载 http://blog.csdn.net/jcjc918/article/details/39032689
+ 
+ 1. 在 csft-4.1/buildconf.sh 文件中，查找
+[plain] view plain copy print?
+&& aclocal \  
+     后加上         //我是修改 也可以！！！！
+[plain] view plain copy print?
+&& automake --add-missing \      
+
+     2. 在 csft-4.1/configure.ac 文件中，查找：
+[plain] view plain copy print?
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])  
+     改为：
+[plain] view plain copy print?
+AM_INIT_AUTOMAKE([-Wall foreign])  
+
+     查找：
+[plain] view plain copy print?
+AC_PROG_RANLIB   
+     后面加上
+[plain] view plain copy print?
+AM_PROG_AR  
+
+      3. 最后，在 csft-4.1/src/sphinxexpr.cpp 文件中， 替换所有：
+[plain] view plain copy print?
+T val = ExprEval ( this->m_pArg, tMatch );  
+      成为：
+[plain] view plain copy print?
+T val = this->ExprEval ( this->m_pArg, tMatch );  
